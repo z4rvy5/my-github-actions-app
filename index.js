@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.send(' Auto deployed using GitHub Actions + Docker + AWS EC2');
+  res.send(' Content updated automatically using CI/CD pipeline');
 });
 
 app.listen(3000, () => {
