@@ -1,0 +1,41 @@
+name: Deploy Node App to AWS EC2 using Docker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t my-node-app .
+
+      - name: Save Docker image
+        run: docker save my-node-app > app.tar
+
+      - name: Copy image to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          source: "app.tar"
+          target: "/home/ubuntu/"
+
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            docker load < app.tar
+            docker stop my-node-app || true
+            docker rm my-node-app || true
+            docker run -d -p 3000:3000 --name my-node-app my-node-app
