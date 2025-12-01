@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 
 app.get('/', (req, res) => {
-  res.send(' Auto deployed using Jenkins Webhook.');
+  res.send(' Full auto deployment using Jenkins.');
 });
 
 app.listen(3000, () => {
